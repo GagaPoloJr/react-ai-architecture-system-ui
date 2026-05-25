@@ -29,11 +29,11 @@ export function MenuFilterBar({
             type="button"
             onClick={() => onFilterChange({ ...filters, category: cat.value })}
             className={cn(
-              'cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+              'cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-all',
               (filters.category === cat.value ||
                 (!filters.category && cat.value === ''))
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                ? 'bg-gradient-brand text-text-inverse shadow-sm'
+                : 'bg-surface-alt text-text-secondary hover:bg-surface-hover',
             )}
           >
             {cat.label}
@@ -42,7 +42,7 @@ export function MenuFilterBar({
 
         <div className="ml-auto flex w-full sm:w-auto items-center gap-3">
           <div className="relative flex-1 sm:flex-initial">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-tertiary" />
             <input
               type="text"
               placeholder="Search menu..."
@@ -50,7 +50,7 @@ export function MenuFilterBar({
               onChange={(e) =>
                 onFilterChange({ ...filters, search: e.target.value })
               }
-              className="w-full sm:w-64 rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full sm:w-64 input-field pl-10"
             />
           </div>
 
@@ -58,8 +58,8 @@ export function MenuFilterBar({
             type="button"
             onClick={onAddItem}
             className={cn(
-              'inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-              'bg-blue-600 text-white hover:bg-blue-700',
+              'btn inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium',
+              'bg-gradient-brand text-text-inverse shadow-sm',
             )}
           >
             <Plus className="h-4 w-4" />

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { RefreshCw } from 'lucide-react'
+import { cn } from '@shared/utils/cn'
 import { useOrderList, useUpdateOrderStatus } from '@features/orders'
 import { useCreatePayment } from '@features/payments'
 import { ActiveOrdersBoard, OrderDetailDrawer } from '@features/orders/components'
@@ -53,12 +55,16 @@ export default function OrdersPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Orders Board</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Orders Board</h1>
         <button
           type="button"
           onClick={() => refetch()}
-          className="cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          className={cn(
+            'btn inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border-default px-4 py-2 text-sm font-medium text-text-secondary',
+            'hover:bg-surface-alt',
+          )}
         >
+          <RefreshCw className="size-4" />
           Refresh
         </button>
       </div>

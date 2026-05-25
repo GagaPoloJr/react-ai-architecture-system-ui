@@ -11,17 +11,17 @@ const statusStyles = {
   available: {
     border: 'border-green-500',
     badge: 'bg-green-500',
-    fill: 'fill-green-500',
+    glow: 'shadow-glow-brand',
   },
   occupied: {
     border: 'border-red-400',
     badge: 'bg-red-400',
-    fill: 'fill-red-400',
+    glow: 'shadow-glow-amber',
   },
   reserved: {
     border: 'border-amber-400',
     badge: 'bg-amber-400',
-    fill: 'fill-amber-400',
+    glow: 'shadow-glow-amber',
   },
 }
 
@@ -33,17 +33,26 @@ export function TableCard({ table, onSelect }: TableCardProps) {
       type="button"
       onClick={() => onSelect?.(table)}
       className={cn(
-        'relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 p-6 shadow-sm transition-all hover:shadow-md',
+        'card-hover relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 p-6',
         style.border,
+        'bg-surface-card',
       )}
     >
-      <span className="absolute right-2 top-2">
-        <Circle className={cn('h-3 w-3', style.fill)} />
-      </span>
-      <span className="text-2xl font-bold">{table.number}</span>
-      <span className="flex items-center gap-1 text-sm text-gray-500">
-        <Users className="h-4 w-4" />
+      <Circle className={cn('absolute right-3 top-3 size-3 fill-current', style.badge)} />
+      <span className="text-2xl font-bold text-text-primary">{table.number}</span>
+      <span className="flex items-center gap-1.5 text-sm text-text-secondary">
+        <Users className="size-4" />
         {table.capacity}
+      </span>
+      <span
+        className={cn(
+          'mt-1 rounded-full px-2.5 py-0.5 text-xs font-medium',
+          table.status === 'available' && 'bg-green-100 text-green-700',
+          table.status === 'occupied' && 'bg-red-100 text-red-700',
+          table.status === 'reserved' && 'bg-amber-100 text-amber-700',
+        )}
+      >
+        {table.status}
       </span>
     </button>
   )

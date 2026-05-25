@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as Dialog from '@radix-ui/react-dialog'
-import { Plus, Minus, Trash2, ShoppingCart, X } from 'lucide-react'
+import { Plus, Minus, Trash2, ShoppingCart } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@shared/utils/cn'
+import { Dialog } from '@shared/ui/molecules/dialog'
+import { Button } from '@shared/ui/atoms'
 import { orderSchema, type OrderFormValues } from '../schemas'
 import type { Table } from '@features/tables/types'
 import type { MenuItem } from '@features/menu/types'
@@ -108,151 +109,140 @@ export function NewOrderModal({ open, onOpenChange, tables, menuItems, onSubmit 
   )
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay className={cn('fixed inset-0 z-40 bg-black/30')} />
-        <Dialog.Content
-          className={cn('fixed left-1/2 top-1/2 z-50 w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white shadow-2xl')}
-        >
-          <div className={cn('flex items-center justify-between border-b border-gray-200 px-6 py-4')}>
-            <Dialog.Title className={cn('flex items-center gap-2 text-lg font-bold')}>
-              <ShoppingCart className={cn('size-5')} />
-              New Order
-            </Dialog.Title>
-            <Dialog.Close className={cn('rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700')}>
-              <X className={cn('size-5')} />
-            </Dialog.Close>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={
+        <span className="flex items-center gap-2">
+          <ShoppingCart className="size-5 text-brand-600" />
+          <span className="text-gradient-brand">New Order</span>
+        </span>
+      }
+      size="lg"
+    >
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col max-h-[80vh]">
+        <div className="flex-1 overflow-y-auto space-y-6">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-text-primary">Table</label>
+            <select
+              {...register('tableId')}
+              className="input-field"
+            >
+              <option value="">Select a table</option>
+              {tables
+                .filter((t) => t.status === 'available')
+                .map((table) => (
+                  <option key={table.id} value={table.id}>
+                    Table {table.number} (Capacity: {table.capacity})
+                  </option>
+                ))}
+            </select>
           </div>
 
-          <form onSubmit={handleSubmit(handleFormSubmit)} className={cn('flex flex-col max-h-[80vh]')}>
-            <div className={cn('flex-1 overflow-y-auto px-6 py-4 space-y-6')}>
-              <div>
-                <label className={cn('mb-1.5 block text-sm font-medium text-gray-700')}>Table</label>
-                <select
-                  {...register('tableId')}
-                  className={cn('w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900')}
+          <div>
+            <div className="mb-3 flex gap-2 flex-wrap">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={cn(
+                    'cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-all',
+                    selectedCategory === cat
+                      ? 'bg-gradient-brand text-text-inverse shadow-sm'
+                      : 'bg-surface-alt text-text-secondary hover:bg-surface-hover',
+                  )}
                 >
-                  <option value="">Select a table</option>
-                  {tables
-                    .filter((t) => t.status === 'available')
-                    .map((table) => (
-                      <option key={table.id} value={table.id}>
-                        Table {table.number} (Capacity: {table.capacity})
-                      </option>
-                    ))}
-                </select>
-              </div>
+                  {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
 
-              <div>
-                <div className={cn('mb-3 flex gap-2 flex-wrap')}>
-                  {categories.map((cat) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {filteredItems
+                .filter((m) => m.isAvailable)
+                .map((item) => {
+                  const inOrder = fields.find((f) => f.menuItemId === item.id)
+                  return (
                     <button
-                      key={cat}
+                      key={item.id}
                       type="button"
-                      onClick={() => setSelectedCategory(cat)}
+                      onClick={() => addItem(item)}
                       className={cn(
-                        'cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
-                        selectedCategory === cat
-                          ? 'bg-gray-900 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                        'card-hover cursor-pointer rounded-xl border px-3 py-2 text-left text-sm transition-all',
+                        inOrder ? 'border-brand-600 bg-gradient-to-b from-brand-50 to-brand-100/50' : 'border-border-subtle hover:border-brand-400',
                       )}
                     >
-                      {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      <span className="block font-medium text-text-primary">{item.name}</span>
+                      <span className="block text-xs text-text-tertiary mt-0.5">{formatIDR(item.price)}</span>
                     </button>
-                  ))}
-                </div>
+                  )
+                })}
+            </div>
+          </div>
 
-                <div className={cn('grid grid-cols-2 sm:grid-cols-3 gap-2')}>
-                  {filteredItems
-                    .filter((m) => m.isAvailable)
-                    .map((item) => {
-                      const inOrder = fields.find((f) => f.menuItemId === item.id)
-                      return (
+          {fields.length > 0 && (
+            <div className="glass rounded-xl p-4">
+              <h4 className="mb-3 font-medium text-text-primary">Order Summary</h4>
+              <div className="space-y-2">
+                {fields.map((field, index) => {
+                  const menuItem = menuItems.find((m) => m.id === field.menuItemId)
+                  return (
+                    <div key={field.id} className="flex items-center justify-between rounded-xl border border-border-subtle bg-surface-card px-3 py-2">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm font-medium truncate block text-text-primary">{menuItem?.name ?? 'Unknown'}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <button
-                          key={item.id}
                           type="button"
-                          onClick={() => addItem(item)}
-                          className={cn(
-                            'cursor-pointer rounded-lg border px-3 py-2 text-left text-sm transition-all hover:border-gray-400',
-                            inOrder ? 'border-gray-900 bg-gray-50' : 'border-gray-200',
-                          )}
+                          onClick={() => updateQuantity(index, -1)}
+                          className="cursor-pointer rounded-md p-1 text-text-tertiary transition-colors hover:bg-surface-alt hover:text-text-primary"
                         >
-                          <span className={cn('block font-medium')}>{item.name}</span>
-                          <span className={cn('block text-xs text-gray-500')}>{formatIDR(item.price)}</span>
+                          <Minus className="size-4" />
                         </button>
-                      )
-                    })}
-                </div>
+                        <span className="flex size-6 items-center justify-center rounded bg-surface-alt text-sm font-medium text-text-secondary">{field.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(index, 1)}
+                          className="cursor-pointer rounded-md p-1 text-text-tertiary transition-colors hover:bg-surface-alt hover:text-text-primary"
+                        >
+                          <Plus className="size-4" />
+                        </button>
+                        <span className="ml-2 text-sm font-medium text-text-secondary">
+                          {formatIDR((menuItem?.price ?? 0) * field.quantity)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => remove(index)}
+                          className="cursor-pointer rounded-md p-1 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
 
-              {fields.length > 0 && (
-                <div>
-                  <h4 className={cn('mb-2 font-medium text-gray-700')}>Order Summary</h4>
-                  <div className={cn('space-y-2')}>
-                    {fields.map((field, index) => {
-                      const menuItem = menuItems.find((m) => m.id === field.menuItemId)
-                      return (
-                        <div key={field.id} className={cn('flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2')}>
-                          <div className={cn('flex-1 min-w-0')}>
-                            <span className={cn('text-sm font-medium truncate block')}>{menuItem?.name ?? 'Unknown'}</span>
-                          </div>
-                          <div className={cn('flex items-center gap-1.5 shrink-0')}>
-                            <button
-                              type="button"
-                              onClick={() => updateQuantity(index, -1)}
-                              className={cn('cursor-pointer rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700')}
-                            >
-                              <Minus className={cn('size-4')} />
-                            </button>
-                            <span className={cn('w-6 text-center text-sm font-medium')}>{field.quantity}</span>
-                            <button
-                              type="button"
-                              onClick={() => updateQuantity(index, 1)}
-                              className={cn('cursor-pointer rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700')}
-                            >
-                              <Plus className={cn('size-4')} />
-                            </button>
-                            <span className={cn('ml-2 text-sm font-medium text-gray-700')}>
-                              {formatIDR((menuItem?.price ?? 0) * field.quantity)}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => remove(index)}
-                              className={cn('cursor-pointer rounded-md p-1 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600')}
-                            >
-                              <Trash2 className={cn('size-4')} />
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  <div className={cn('flex items-center justify-between mt-3 pt-3 border-t border-gray-200')}>
-                    <span className={cn('font-semibold')}>Total</span>
-                    <span className={cn('text-lg font-bold')}>{formatIDR(total)}</span>
-                  </div>
-                </div>
-              )}
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-subtle">
+                <span className="font-semibold text-text-primary">Total</span>
+                <span className="text-lg font-bold text-gradient-brand">{formatIDR(total)}</span>
+              </div>
             </div>
+          )}
+        </div>
 
-            <div className={cn('border-t border-gray-200 px-6 py-4')}>
-              <button
-                type="submit"
-                disabled={!isValid || fields.length === 0}
-                className={cn(
-                  'w-full cursor-pointer rounded-lg px-4 py-2.5 font-medium text-white transition-colors',
-                  isValid && fields.length > 0
-                    ? 'bg-gray-900 hover:bg-gray-800'
-                    : 'bg-gray-300 cursor-not-allowed',
-                )}
-              >
-                Create Order
-              </button>
-            </div>
-          </form>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+        <div className="border-t border-border-subtle pt-4 mt-4">
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={!isValid || fields.length === 0}
+          >
+            Create Order
+          </Button>
+        </div>
+      </form>
+    </Dialog>
   )
 }

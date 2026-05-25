@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
-import { Banknote, CreditCard, QrCode, X } from 'lucide-react'
+import { Banknote, CreditCard, QrCode, Check } from 'lucide-react'
 import { cn } from '@shared/utils/cn'
+import { Dialog } from '@shared/ui/molecules/dialog'
+import { Button } from '@shared/ui/atoms'
 import type { CreatePaymentDto } from '../types'
 
 interface PaymentModalProps {
@@ -34,60 +35,64 @@ export function PaymentModal({
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-xl">
-          <Dialog.Title className="text-lg font-semibold">Process Payment</Dialog.Title>
-          <Dialog.Close className="absolute right-4 top-4 cursor-pointer rounded-lg p-1 text-gray-400 hover:text-gray-600">
-            <X className="h-4 w-4" />
-          </Dialog.Close>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Process Payment"
+      size="sm"
+    >
+      <div className="text-center py-6">
+        <p className="text-sm text-text-secondary">Total Amount</p>
+        <p className="mt-1 text-4xl font-bold text-gradient-brand">
+          Rp {total.toLocaleString()}
+        </p>
+      </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">Total Amount</p>
-            <p className="mt-1 text-3xl font-bold">Rp {total.toLocaleString()}</p>
-          </div>
+      <div className="grid grid-cols-3 gap-3">
+        {methods.map((method) => {
+          const Icon = method.icon
+          const isSelected = selectedMethod === method.value
+          return (
+            <button
+              key={method.value}
+              type="button"
+              onClick={() => setSelectedMethod(method.value)}
+              className={cn(
+                'card-hover flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
+                isSelected
+                  ? 'border-brand-600 bg-gradient-to-b from-brand-50 to-brand-100/50 shadow-sm'
+                  : 'border-border-subtle bg-surface-card hover:border-border-strong',
+              )}
+            >
+              <div className={cn(
+                'flex size-10 items-center justify-center rounded-xl transition-colors',
+                isSelected ? 'bg-brand-600 text-white' : 'bg-surface-alt text-text-tertiary',
+              )}>
+                <Icon className={cn('size-5')} />
+              </div>
+              <span className={cn('text-sm font-medium', isSelected ? 'text-brand-700' : 'text-text-secondary')}>
+                {method.label}
+              </span>
+              {isSelected && (
+                <span className="flex size-5 items-center justify-center rounded-full bg-brand-600">
+                  <Check className="size-3 text-white" />
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </div>
 
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            {methods.map((method) => {
-              const Icon = method.icon
-              const isSelected = selectedMethod === method.value
-              return (
-                <button
-                  key={method.value}
-                  type="button"
-                  onClick={() => setSelectedMethod(method.value)}
-                  className={cn(
-                    'flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 p-4 transition-colors',
-                    isSelected
-                      ? 'border-gray-900 bg-gray-50'
-                      : 'border-gray-200 hover:border-gray-300',
-                  )}
-                >
-                  <Icon className={cn('h-6 w-6', isSelected ? 'text-gray-900' : 'text-gray-400')} />
-                  <span className={cn('text-sm font-medium', isSelected ? 'text-gray-900' : 'text-gray-500')}>
-                    {method.label}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleConfirm}
-            disabled={isProcessing}
-            className={cn(
-              'mt-6 w-full rounded-lg px-4 py-3 text-sm font-medium text-white transition-colors',
-              isProcessing
-                ? 'cursor-not-allowed bg-gray-400'
-                : 'cursor-pointer bg-gray-900 hover:bg-gray-800',
-            )}
-          >
-            {isProcessing ? 'Processing...' : 'Process Payment'}
-          </button>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      <div className="pt-6">
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={handleConfirm}
+          loading={isProcessing}
+        >
+          {isProcessing ? 'Processing...' : 'Process Payment'}
+        </Button>
+      </div>
+    </Dialog>
   )
 }

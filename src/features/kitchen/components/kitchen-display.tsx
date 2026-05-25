@@ -21,10 +21,10 @@ export function KitchenDisplay() {
   }
 
   return (
-    <div className={cn('min-h-[100dvh] bg-gray-50')}>
+    <div className={cn('min-h-[100dvh] bg-surface')}>
       <KitchenHeader pendingCount={pendingCount} preparingCount={preparingCount} />
 
-      <main className={cn('p-6')}>
+      <main className={cn('p-4 sm:p-6 bg-noise')}>
         {isLoading ? (
           <div className={cn('grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6')}>
             {Array.from({ length: 6 }).map((_, i) => (
@@ -32,10 +32,12 @@ export function KitchenDisplay() {
             ))}
           </div>
         ) : activeOrders.length === 0 ? (
-          <div className={cn('flex flex-col items-center justify-center py-24 text-gray-400')}>
-            <CookingPot className={cn('size-16 mb-4')} />
-            <p className={cn('text-2xl font-semibold')}>All orders completed</p>
-            <p className={cn('text-lg')}>Waiting for new orders...</p>
+          <div className={cn('flex flex-col items-center justify-center py-32 text-text-tertiary')}>
+            <div className="flex size-24 items-center justify-center rounded-3xl bg-gradient-to-br from-green-100 to-emerald-200 mb-6 shadow-sm">
+              <CookingPot className={cn('size-12 text-emerald-600 animate-float')} />
+            </div>
+            <p className={cn('text-2xl font-semibold text-text-primary')}>All orders completed</p>
+            <p className={cn('text-lg text-text-tertiary mt-1')}>Waiting for new orders...</p>
           </div>
         ) : (
           <div className={cn('grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6')}>
@@ -55,18 +57,21 @@ export function KitchenDisplay() {
 
 function Skeleton() {
   return (
-    <div className={cn('rounded-xl border-2 border-gray-200 p-6 animate-pulse')}>
+    <div className={cn('rounded-xl border-2 border-border-subtle p-6 animate-pulse bg-gradient-to-br from-surface-card to-surface-alt')}>
       <div className={cn('flex items-center gap-3 mb-4')}>
-        <div className={cn('size-8 rounded-lg bg-gray-200')} />
-        <div className={cn('h-8 w-40 rounded bg-gray-200')} />
+        <div className={cn('size-12 rounded-xl bg-border-default')} />
+        <div className={cn('space-y-2')}>
+          <div className={cn('h-8 w-40 rounded bg-border-default')} />
+          <div className={cn('h-4 w-24 rounded bg-border-default')} />
+        </div>
       </div>
-      <div className={cn('h-4 w-32 rounded bg-gray-200 mb-4')} />
+      <div className={cn('h-4 w-32 rounded bg-border-default mb-4')} />
       <div className={cn('space-y-2 mb-6')}>
-        <div className={cn('h-6 w-full rounded bg-gray-200')} />
-        <div className={cn('h-6 w-3/4 rounded bg-gray-200')} />
-        <div className={cn('h-6 w-1/2 rounded bg-gray-200')} />
+        <div className={cn('h-6 w-full rounded bg-border-default')} />
+        <div className={cn('h-6 w-3/4 rounded bg-border-default')} />
+        <div className={cn('h-6 w-1/2 rounded bg-border-default')} />
       </div>
-      <div className={cn('h-12 w-full rounded-lg bg-gray-200')} />
+      <div className={cn('h-12 w-full rounded-xl bg-border-default')} />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import { toast } from 'sonner'
-import { cn } from '@shared/utils/cn'
 import { useTableList } from '@features/tables'
 import { TableCard } from './table-card'
+import { Button } from '@shared/ui/atoms'
+import { RefreshCw } from 'lucide-react'
 import type { TableFilters } from '@features/tables/types'
 
 interface TableGridProps {
@@ -14,7 +15,7 @@ function SkeletonGrid() {
       {Array.from({ length: 8 }).map((_, i) => (
         <div
           key={i}
-          className="h-32 animate-pulse rounded-xl bg-gray-200"
+          className="h-32 animate-pulse rounded-xl bg-gradient-to-br from-border-subtle to-border-default/50"
         />
       ))}
     </div>
@@ -30,22 +31,20 @@ export function TableGrid({ filters }: TableGridProps) {
 
   if (isError) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg font-medium text-gray-900">Failed to load tables</p>
-          <button
-            type="button"
+          <p className="text-lg font-medium text-text-primary">Failed to load tables</p>
+          <Button
+            variant="secondary"
+            className="mt-4"
             onClick={() => {
               toast.error('Failed to load tables')
               refetch()
             }}
-            className={cn(
-              'mt-4 cursor-pointer rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white',
-              'hover:bg-gray-800',
-            )}
           >
+            <RefreshCw className="size-4" />
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -53,8 +52,8 @@ export function TableGrid({ filters }: TableGridProps) {
 
   if (!tables?.length) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center">
-        <p className="text-lg font-medium text-gray-500">No tables configured</p>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-lg font-medium text-text-tertiary">No tables configured</p>
       </div>
     )
   }

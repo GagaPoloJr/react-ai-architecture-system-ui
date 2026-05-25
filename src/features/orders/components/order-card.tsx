@@ -31,35 +31,37 @@ export function OrderCard({ order, onViewDetail }: OrderCardProps) {
   const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <div className={cn('rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md')}>
+    <div className={cn('card-hover rounded-xl border border-border-subtle bg-surface-card p-4')}>
       <div className={cn('flex items-center justify-between mb-3')}>
         <div className={cn('flex items-center gap-2')}>
-          <UtensilsCrossed className={cn('size-5 text-gray-500')} />
-          <span className={cn('text-lg sm:text-xl font-bold truncate')}>Table {order.tableId}</span>
+          <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-100 to-brand-200">
+            <UtensilsCrossed className={cn('size-4 text-brand-700')} />
+          </div>
+          <span className={cn('text-lg sm:text-xl font-bold truncate text-text-primary')}>Table {order.tableId}</span>
         </div>
-        <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium', statusStyles[order.status])}>
+        <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium shadow-sm', statusStyles[order.status])}>
           {statusLabels[order.status] ?? order.status}
         </span>
       </div>
 
       <div className={cn('flex items-center justify-between mb-3')}>
-        <span className={cn('text-sm text-gray-500')}>
+        <span className={cn('text-sm text-text-tertiary')}>
           {itemCount} {itemCount === 1 ? 'item' : 'items'}
         </span>
-        <span className={cn('flex items-center gap-1 text-sm text-gray-500')}>
+        <span className={cn('flex items-center gap-1 text-sm text-text-tertiary')}>
           <Clock className={cn('size-3.5')} />
           {elapsed}
         </span>
       </div>
 
       <div className={cn('flex items-center justify-between')}>
-        <span className={cn('text-base sm:text-lg font-bold text-gray-900')}>{formatIDR(order.total)}</span>
+        <span className={cn('text-base sm:text-lg font-bold text-gradient-brand')}>{formatIDR(order.total)}</span>
         <button
           type="button"
           onClick={() => onViewDetail(order.id)}
-          className={cn('flex cursor-pointer items-center gap-1 rounded-lg bg-gray-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-gray-800')}
+          className={cn('btn flex cursor-pointer items-center gap-1 rounded-lg bg-gradient-brand px-3 py-1.5 text-sm font-medium text-text-inverse shadow-sm')}
         >
-          View Details
+          Details
           <ChevronRight className={cn('size-4')} />
         </button>
       </div>

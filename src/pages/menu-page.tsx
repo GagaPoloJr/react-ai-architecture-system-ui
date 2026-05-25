@@ -52,8 +52,8 @@ export default function MenuPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Menu Management</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-text-primary">Menu Management</h1>
       </div>
 
       <div className="mb-6">
