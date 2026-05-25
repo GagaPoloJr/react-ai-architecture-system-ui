@@ -6,22 +6,16 @@
 - **Route errors**: react-router-dom v7 `errorElement`
 - **API errors**: Axios v1 interceptors → normalized `AppError`
 - **Toast notifications**: sonner v2
-- **i18n**: i18next v24 (translated user-facing messages)
 
 ## Error Boundary Hierarchy
 
 ```
 <App>
-  └── <RootErrorBoundary>                    ← Catch-all (sonner toast + refresh)
-      └── <QueryClientProvider>               ← @tanstack/react-query v5
-          └── <ThemeProvider>                 ← next-themes v0.4
-              └── <RouterProvider>            ← react-router-dom v7
-                  ├── <AuthLayout>
-                  │   └── <LoginPage />       ← errorElement: <RouteErrorFallback />
-                  └── <AppLayout>
-                      └── <AuthGuard>
-                          └── <Suspense>
-                              └── <DashboardPage />  ← errorElement: <RouteErrorFallback />
+  └── <QueryClientProvider>               ← @tanstack/react-query v5
+      └── <RouterProvider>                ← react-router-dom v7
+          └── <PosLayout>
+              └── <Suspense>
+                  └── <{Page} />          ← errorElement: <RouteErrorFallback />
 ```
 
 ## Error Boundary Component
@@ -92,6 +86,7 @@ export function parseAxiosError(error: unknown): AppError {
       data?.details,
     )
   }
+  if (error instanceof AppError) return error
   return new AppError('UNKNOWN_ERROR', 'An unexpected error occurred', 500)
 }
 ```
@@ -107,8 +102,7 @@ client.interceptors.response.use(
   (error) => {
     const appError = parseAxiosError(error)
     if (appError.status === 401) {
-      Cookies.remove('access_token')
-      window.location.href = ROUTES.AUTH.LOGIN
+      console.warn('Unauthorized — redirect to login')
     }
     return Promise.reject(appError)
   },
@@ -120,25 +114,30 @@ client.interceptors.response.use(
 ```tsx
 // src/routes/error-fallback.tsx
 import { useRouteError, isRouteErrorResponse } from 'react-router-dom'
-import { Button } from '@shared/ui/atoms/button'
 
 export function RouteErrorFallback() {
   const error = useRouteError()
 
   if (isRouteErrorResponse(error)) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold">{error.status}</h1>
-        <p className="text-muted-foreground">{error.statusText}</p>
-        <Button onClick={() => window.location.reload()}>Reload</Button>
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4">
+        <h1 className="text-4xl font-bold text-gray-900">{error.status}</h1>
+        <p className="text-gray-500">{error.statusText}</p>
+        <button type="button" onClick={() => window.location.reload()}
+          className="cursor-pointer rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
+          Reload
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <p>Something went wrong</p>
-      <Button onClick={() => window.location.reload()}>Reload</Button>
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4">
+      <p className="text-gray-500">Something went wrong</p>
+      <button type="button" onClick={() => window.location.reload()}
+        className="cursor-pointer rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
+        Reload
+      </button>
     </div>
   )
 }
@@ -153,9 +152,7 @@ import { useMutation } from '@tanstack/react-query'
 export function useCreateUser() {
   return useMutation({
     mutationFn: (data: CreateUserDto) => userApi.create(data),
-    onError: (error: AppError) => {
-      toast.error(error.message)
-    },
+    onError: (error: AppError) => toast.error(error.message),
     onSuccess: () => {
       toast.success('User created successfully')
       queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
@@ -193,6 +190,6 @@ const mutation = useCreateUser({
 
 ## User-Facing Messages
 
-- All user-facing error messages go through i18n via `react-i18next v15`: `t('errors:networkTimeout')`.
 - Messages are specific and actionable: "Could not save. Please try again."
 - Avoid technical jargon: no "500 Internal Server Error" to users.
+- The project does not use i18n — write error messages directly in English/Indonesian matching the UI context.

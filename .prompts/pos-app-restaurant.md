@@ -1,12 +1,25 @@
-# Prompt: POS App Restaurant
+# Prompt Template: Project Scaffold & Feature Generation
 
 > Copy-paste this entire prompt to your AI agent (Claude Code, Gemini CLI, Cursor, opencode).
 > The AI will read `core.md` + all referenced files for full context.
+>
+> **To adapt for your own project**: Replace the "Project" section with your project's name and features.
+> Keep the file references, setup steps, standards, and structure — they are project-agnostic.
+
+---
+
+## How to Use This Template
+
+1. Replace the **Project** section below with your app name and feature list
+2. Adjust the **Feature Definitions** to match your domain
+3. Keep everything else — it references the architecture docs that ship with this project
+4. Delete or add agent/architecture files as needed in the context list below
 
 ---
 
 Read `core.md`. Then load all these files for context:
 
+### Agents
 - `.agent/frontend-architect.md`
 - `.agent/feature-generator.md`
 - `.agent/ui-engineer.md`
@@ -14,6 +27,8 @@ Read `core.md`. Then load all these files for context:
 - `.agent/form-engineer.md`
 - `.agent/state-manager.md`
 - `.agent/animation-engineer.md`
+
+### Architecture
 - `.architecture/folder-structure.md`
 - `.architecture/state-management.md`
 - `.architecture/api-layer.md`
@@ -21,6 +36,16 @@ Read `core.md`. Then load all these files for context:
 - `.architecture/routing.md`
 - `.architecture/ui-hierarchy.md`
 - `.architecture/validation.md`
+- `.architecture/error-handling.md`
+- `.architecture/mocking.md`
+- `.architecture/responsive.md`
+- `.architecture/environments.md`
+- `.architecture/imports-aliases.md`
+- `.architecture/types.md`
+- `.architecture/shared-layer.md`
+- `.architecture/utilities.md`
+
+### Templates
 - `.templates/feature/feature-template.md`
 - `.templates/component/component-template.md`
 - `.templates/hook/hook-template.md`
@@ -28,19 +53,41 @@ Read `core.md`. Then load all these files for context:
 - `.templates/form/form-template.md`
 - `.templates/state/state-template.md`
 - `.templates/page/page-template.md`
+
+### Workflows & Rules
 - `.workflows/feature-planning.md`
 - `.workflows/api-integration.md`
 - `.workflows/state-decision-tree.md`
 - `.rules/scalability.md`
 - `.rules/feature-isolation.md`
 - `.rules/reusability.md`
+
+### Design
 - `.design/design-taste-frontend/SKILL.md`
 
 ---
 
-## Project: Restaurant POS
+## 0. Project Setup
 
-Build a Point of Sale web app for a restaurant. The app is already bootstrapped — all dependencies installed, directory structure ready, all architecture files present.
+Before scaffolding features, ensure the project environment is ready:
+
+```bash
+# Use correct Node version
+nvm use               # or: fnm use
+node --version        # should match .nvmrc (20)
+
+# Install dependencies (no --legacy-peer-deps needed)
+npm install
+
+# Copy environment template
+cp .env.example .env.local
+```
+
+Verify:
+- `.nvmrc` exists with Node version (e.g. `20`)
+- `.env.local` has `VITE_API_URL` set (default: `http://localhost:3001/api`)
+- `npm run dev` starts without errors
+- Mock interceptor is active in dev (all API calls return mock data)
 
 ---
 
@@ -49,279 +96,211 @@ Build a Point of Sale web app for a restaurant. The app is already bootstrapped 
 Run these commands one by one:
 
 ```bash
-bash .scaffolds/feature-scaffold.sh menu
-bash .scaffolds/feature-scaffold.sh orders
-bash .scaffolds/feature-scaffold.sh tables
-bash .scaffolds/feature-scaffold.sh payments
-bash .scaffolds/feature-scaffold.sh kitchen
+bash .scaffolds/feature-scaffold.sh {{featureName1}}
+bash .scaffolds/feature-scaffold.sh {{featureName2}}
+bash .scaffolds/feature-scaffold.sh {{featureName3}}
+```
+
+Each command creates:
+```
+src/features/{{featureName}}/
+├── api/
+├── components/
+├── schemas/
+├── types/
+└── index.ts
 ```
 
 ---
 
 ## 2. Feature Definitions
 
-### 2a. Menu Feature (`src/features/menu/`)
+For each feature, follow this structure. Adapt the types, API endpoints, and components to your domain.
 
-**types/index.ts** — define:
-- `MenuItem` — id, name, description, price (number), category (food | beverage | snack), imageUrl (string | null), isAvailable (boolean), createdAt
-- `CreateMenuItemDto` — name, description, price, category, imageUrl?, isAvailable
-- `MenuItemFilters` — category?, isAvailable?, search?
+### Per-Feature File Map
 
-**schemas/index.ts** — define:
-- `menuItemSchema` — zod validation: name min 2 chars required, price positive number, category enum food/beverage/snack
+```
+src/features/{{featureName}}/
+├── api/
+│   ├── {{featureName}}-api.ts       # Axios service functions (typed calls)
+│   ├── {{featureName}}.query.ts     # Query key factory + useQuery hooks
+│   ├── {{featureName}}.mutation.ts  # useMutation hooks with sonner toasts
+│   └── index.ts                     # Barrel exports
+├── components/
+│   └── {{component-name}}.tsx
+├── schemas/
+│   └── index.ts                     # Zod validation schemas
+├── types/
+│   └── index.ts                     # TypeScript interfaces
+└── index.ts                         # Feature barrel (re-exports from api/ and types/)
+```
 
-**api/index.ts** — create with:
-- GET `/menu` (list, with filters)
-- GET `/menu/:id` (detail)
-- POST `/menu` (create)
-- PATCH `/menu/:id` (update)
-- DELETE `/menu/:id` (remove)
+### Example: Menu Feature
 
-**hooks/index.ts** — create:
-- `useMenuList(filters?)` — query with staleTime: 1 minute
-- `useMenuItemDetail(id)` — query, enabled only when id exists
-- `useCreateMenuItem` — mutation, invalidates menu list on success
-- `useUpdateMenuItem` — mutation
-- `useDeleteMenuItem` — mutation
+```typescript
+// types/index.ts
+export interface MenuItem {
+  id: string
+  name: string
+  description: string
+  price: number
+  category: 'food' | 'beverage' | 'snack'
+  imageUrl: string | null
+  isAvailable: boolean
+  createdAt: string
+}
+export type UpdateMenuItemDto = Partial<CreateMenuItemDto>
+export interface MenuItemFilters { category?: string; isAvailable?: boolean; search?: string }
+```
 
-**components/** — create:
-- `menu-grid.tsx` — grid display of menu items with image, name, price, category badge (component: `MenuGrid`)
-- `menu-item-card.tsx` — single card with add-to-order button, stock indicator (component: `MenuItemCard`)
-- `menu-filter-bar.tsx` — filter by category, search input (component: `MenuFilterBar`)
-- `menu-form-dialog.tsx` — modal form for add/edit menu item using RHF + zod (component: `MenuFormDialog`)
+```typescript
+// schemas/index.ts — zod validation
+export const menuItemSchema = z.object({
+  name: z.string().min(2),
+  price: z.number().positive(),
+  category: z.enum(['food', 'beverage', 'snack']),
+})
+```
 
-### 2b. Orders Feature (`src/features/orders/`)
+```typescript
+// api/menu-api.ts — use client.get/post/patch/delete (no wrapper helpers)
+import { client } from '@shared/api/client'
+const BASE = '/menu'
+export const menuApi = {
+  list: (params?: MenuItemFilters) => client.get<MenuItem[]>(BASE, { params }).then(r => r.data),
+  byId: (id: string) => client.get<MenuItem>(`${BASE}/${id}`).then(r => r.data),
+  create: (data: CreateMenuItemDto) => client.post<MenuItem>(BASE, data).then(r => r.data),
+  update: (id: string, data: UpdateMenuItemDto) => client.patch<MenuItem>(`${BASE}/${id}`, data).then(r => r.data),
+  remove: (id: string) => client.delete(`${BASE}/${id}`),
+}
+```
 
-**types/index.ts** — define:
-- `OrderItem` — menuItemId, name, price, quantity, notes?
-- `Order` — id, tableId, items (OrderItem[]), status (pending | preparing | served | paid), total, createdAt
-- `CreateOrderDto` — tableId, items
-- `OrderFilters` — status?, tableId?, date?
+```typescript
+// api/menu.query.ts — co-located query keys + useQuery hooks
+export const queryKeys = {
+  all: ['menu'] as const,
+  lists: () => [...queryKeys.all, 'list'] as const,
+  list: (filters?: MenuItemFilters) => [...queryKeys.lists(), filters] as const,
+  details: () => [...queryKeys.all, 'detail'] as const,
+  detail: (id: string) => [...queryKeys.details(), id] as const,
+}
+export function useMenuList(filters?: MenuItemFilters) { ... }
+export function useMenuItemDetail(id: string) { ... }
+```
 
-**schemas/index.ts** — define:
-- `orderItemSchema` — menuItemId required, quantity min 1, notes optional
-- `orderSchema` — tableId required, items array min 1 item
+```typescript
+// api/menu.mutation.ts — mutations with cache invalidation + sonner toasts
+export function useCreateMenuItem() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CreateMenuItemDto) => menuApi.create(data),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.all }); toast.success('Menu item created') },
+    onError: (error) => { toast.error(error.message || 'Failed to create menu item') },
+  })
+}
+```
 
-**api/index.ts** — CRUD + status update PATCH `/orders/:id/status`
+```typescript
+// index.ts — barrel
+export { useMenuList, useMenuItemDetail, useCreateMenuItem, ... } from './api'
+export type { MenuItem, MenuItemFilters, ... } from './types'
+```
 
-**hooks/index.ts** — useOrderList, useOrderDetail, useCreateOrder, useUpdateOrderStatus
+### Kitchen Feature (special case — separate API from orders)
 
-**components/** — create:
-- `active-orders-board.tsx` — kanban-style columns by status (component: `ActiveOrdersBoard`)
-- `order-card.tsx` — compact order card with items, total, time, action buttons (component: `OrderCard`)
-- `order-detail-drawer.tsx` — slide-out drawer with full order details (component: `OrderDetailDrawer`)
-- `new-order-modal.tsx` — create order: select table, add items from menu, set quantities (component: `NewOrderModal`)
+Kitchen has its **own API endpoints** with a different data shape than orders. Add mock endpoints for it in `src/mocks/interceptor.ts` following the pattern in `.architecture/mocking.md`.
 
-### 2c. Tables Feature (`src/features/tables/`)
-
-**types/index.ts** — define:
-- `Table` — id, number, capacity, status (available | occupied | reserved)
-- `TableFilters` — status?
-
-**api/index.ts** — GET `/tables`, PATCH `/tables/:id/status`
-
-**hooks/index.ts** — useTableList, useUpdateTableStatus
-
-**components/** — create:
-- `table-grid.tsx` — visual grid of tables with status colors, capacity indicator (component: `TableGrid`)
-- `table-card.tsx` — single table: number, capacity, status, click to view orders (component: `TableCard`)
-
-### 2d. Payments Feature (`src/features/payments/`)
-
-**types/index.ts** — define:
-- `Payment` — id, orderId, amount, method (cash | card | qris), status, paidAt
-- `CreatePaymentDto` — orderId, amount, method
-
-**schemas/index.ts** — payment method enum validation
-
-**api/index.ts** — POST `/payments`, GET `/payments/order/:orderId`
-
-**hooks/index.ts** — useCreatePayment, usePaymentByOrder
-
-**components/** — create:
-- `payment-modal.tsx` — payment method selection, amount display, confirmation (component: `PaymentModal`)
-- `payment-receipt.tsx` — printable receipt summary (component: `PaymentReceipt`)
-
-### 2e. Kitchen Feature (`src/features/kitchen/`)
-
-**types/index.ts** — define:
-- `KitchenOrder` — id, tableNumber, items, status, createdAt, notes
-- `KitchenFilters` — status?, date?
-
-**components/** — create:
-- `kitchen-display.tsx` — large screen display showing pending/preparing orders (component: `KitchenDisplay`)
-- `kitchen-order-card.tsx` — large card with item list, timer, action buttons (component: `KitchenOrderCard`)
-- `kitchen-header.tsx` — current time, order count stats (component: `KitchenHeader`)
+```typescript
+// api/kitchen-api.ts
+export const kitchenApi = {
+  list: (params?: KitchenFilters) => client.get<KitchenOrder[]>('/kitchen', { params }).then(r => r.data),
+  updateStatus: (orderId: string, status: KitchenOrder['status']) =>
+    client.patch<KitchenOrder>(`/kitchen/${orderId}/status`, { status }).then(r => r.data),
+}
+```
 
 ---
 
-## 3. Shared Components
+## 3. Error Handling Setup
 
-Create these in `src/shared/ui/`:
+After features are scaffolded, set up the route-level error boundary:
 
-Run:
+- Create `src/routes/error-fallback.tsx` using `useRouteError` + `isRouteErrorResponse`
+- Add `errorElement: <RouteErrorFallback />` to your root route in the router
+- All mutations should already have `onError` with `toast.error()` — this is part of the mutation template
+
+See `.architecture/error-handling.md` for the full pattern.
+
+---
+
+## 4. Mocking Setup
+
+The project uses an Axios request interceptor-based mock system (`src/mocks/interceptor.ts`). After creating feature API modules, add corresponding mock endpoint handlers:
+
+1. Open `src/mocks/interceptor.ts`
+2. Add a new `if (method === 'get' && path === '/your-entity')` block in `handleRequest()`
+3. Add initial seed data to `src/mocks/mock-data.ts` if needed
+
+The mock interceptor registers itself automatically in dev mode via `src/shared/api/client.ts`. No additional setup needed.
+
+See `.architecture/mocking.md` for detailed instructions.
+
+---
+
+## 5. Responsive Design
+
+Apply these conventions to every component:
+
+- Use the **mobile-first** approach: base styles = mobile, breakpoints (`sm:`, `md:`, `lg:`) = larger screens
+- Add `flex-wrap` to any horizontal flex row that might overflow on small screens
+- Use `w-full sm:w-{size}` instead of hardcoded widths like `w-64`
+- Add `pb-16 md:pb-0` to `<main>` content to account for the mobile bottom tab bar
+- Sidebar layouts: `flex flex-col gap-6 lg:flex-row` with `w-full lg:w-80 shrink-0`
+
+See `.architecture/responsive.md` for full reference.
+
+---
+
+## 6. Shared Components
+
+Create shared UI primitives in `src/shared/ui/`:
+
 ```bash
 bash .scaffolds/component-scaffold.sh StatusBadge shared/ui
 bash .scaffolds/component-scaffold.sh SearchInput shared/ui
 bash .scaffolds/component-scaffold.sh ConfirmDialog shared/ui
 ```
 
-Then implement each:
-- `StatusBadge` — colored pill for order/table status with CVA variants (pending=amber, preparing=blue, served=green, paid=gray)
-- `SearchInput` — lucide-react Search icon, debounced onChange via custom hook
-- `ConfirmDialog` — Radix AlertDialog wrapper for delete/confirm actions
+---
+
+## 7. State Management (Zustand)
+
+Create stores in `src/stores/` using zustand v5 with `create` + `devtools` middleware.
 
 ---
 
-## 4. Shared Store (Zustand)
+## 8. Routing
 
-Create `src/stores/order-store.ts`:
-
-- `activeOrderItems` — items currently being added to a new order (before submit)
-- `selectedTableId` — currently selected table
-- `addItem(item)`, `removeItem(menuItemId)`, `updateQuantity(menuItemId, qty)`, `clearOrder()`
-
-Use zustand v5 with `create` + `devtools` middleware.
+Use `react-router-dom` v7 `createBrowserRouter` with `lazy()` imports for every page.
 
 ---
 
-## 5. Routing
-
-Create `src/routes/index.tsx` with react-router-dom v7 `createBrowserRouter`:
-
-| Path | Page | Auth? |
-|------|------|-------|
-| `/` | Redirect to `/pos` | - |
-| `/pos` | POS main screen (tables + order panel) | No |
-| `/pos/menu` | Menu management page | No |
-| `/pos/orders` | Active orders board | No |
-| `/pos/kitchen` | Kitchen display screen | No |
-| `/pos/payments` | Payment history | No |
-
-Use `lazy()` for every route. Wrap inside `src/pages/`:
-- `pos-page.tsx` — main POS layout with table grid + order sidebar
-- `menu-page.tsx` — menu management
-- `orders-page.tsx` — orders board
-- `kitchen-page.tsx` — kitchen display
-- `payments-page.tsx` — payment history
-
----
-
-## 6. App Layout
-
-Create `src/layouts/pos-layout.tsx`:
-
-- Top navbar: logo, nav links (Menu, Orders, Kitchen, Payments), clock
-- Sidebar: table status overview (compact)
-- Main content area with `<Outlet />`
-- Responsive: sidebar collapses on mobile
-
----
-
-## 7. Design System — Taste Skill
-
-Follow the `design-taste-frontend` skill with these dials:
-
-```
-DESIGN_VARIANCE: 6
-MOTION_INTENSITY: 4
-VISUAL_DENSITY: 5
-```
-
-### Anti-Slop Rules (REQUIRED)
-- **NO** 3-column equal card grids — use asymmetric bento layout
-- **NO** centered hero/H1 sections — left-align content
-- **NO** Inter font — use `Geist` or `Satoshi` (via `@fontsource-variable/inter` as fallback)
-- **NO** pure black (`#000000`) — use off-black, zinc-950
-- **NO** neon glows or gradient text
-- **NO** emojis anywhere in code or text — use lucide-react icons instead
-- **NO** "Acme", "Nexus", "Demo" or generic startup names
-- **NO** generic SVG egg avatars
-- **NO** "John Doe", fake phone numbers, or `99.99%` fake data
-- **NO** `h-screen` — always use `min-h-[100dvh]`
-- **NO** flexbox percentage math (`w-[calc(33%-1rem)]`) — use CSS Grid
-- **NO** Unsplash placeholder images — use colored gradient placeholders or `https://placehold.co`
-
-### UI Style: Bright & Clean
-- **Primary palette**: Bright teal/emerald (`#0d9488` or `#059669`) + warm amber (`#d97706`) for accents
-- **Background**: Warm white (`#fafaf9` or `#f8fafc`) — not pure white
-- **Cards**: White (`#ffffff`) with subtle shadow `shadow-[0_1px_3px_rgba(0,0,0,0.06)]`
-- **Typography**: Dark slate (`#0f172a` / zinc-900) for headings, slate-600 for body
-- **Status colors**: Pending=amber, Preparing=blue, Served=green, Paid=gray
-- **Spacing**: Generous — `p-6` cards, `gap-4` grids, `space-y-8` sections
-- **Border radius**: `rounded-xl` for cards, `rounded-lg` for buttons/inputs
-- **Table occupied**: subtle red/amber border, **Available**: green border
-
----
-
-## 8. POS Main Page (`src/pages/pos-page.tsx`)
-
-This is the core screen. Layout:
-
-```
-┌──────────────────────────────────────────────────────┐
-│  Header: Logo | Nav tabs | Clock           │
-├──────────────────────┬───────────────────────────────┤
-│  Table Grid          │  Order Panel (side drawer)    │
-│  ┌──┐ ┌──┐ ┌──┐     │  ┌─────────────────────────┐  │
-│  │T1│ │T2│ │T3│     │  │ Table #5                │  │
-│  └──┘ └──┘ └──┘     │  ├─────────────────────────┤  │
-│  ┌──┐ ┌──┐ ┌──┐     │  │ Item    Qty  Price      │  │
-│  │T4│ │T5│ │T6│     │  │ Nasi G. 2   Rp 30k     │  │
-│  └──┘ └──┘ └──┘     │  │ Es Teh  1   Rp 5k      │  │
-│                      │  ├─────────────────────────┤  │
-│                      │  │ Total:         Rp 35k   │  │
-│                      │  ├─────────────────────────┤  │
-│                      │  │ [Add Item] [Pay] [Send] │  │
-│                      └──────────────────────────┘  │
-├──────────────────────┴───────────────────────────────┤
-│  Footer: Order count | Total revenue today           │
-└──────────────────────────────────────────────────────┘
-```
-
-### States to handle:
-- **Loading**: Skeleton placeholders for table grid, shimmer effect
-- **Empty**: "No tables configured" with add button for tables
-- **Error**: "Failed to load tables" with retry button (sonner toast on error)
-- **Edge cases**: 
-  - Clicking occupied table shows existing order
-  - Clicking available table starts new order flow
-  - Adding item to order opens menu item selector modal
-  - Pay button opens payment modal
-  - Send to kitchen sends order items to kitchen display
-
----
-
-## 9. Implementation Order
-
-Build features in this exact sequence:
-
-1. **Shared components** — StatusBadge, SearchInput, ConfirmDialog
-2. **Zustand store** — order-store with active items
-3. **Tables feature** — list, status grid
-4. **Menu feature** — CRUD, categories, grid display
-5. **Orders feature** — create, list, status management
-6. **POS page** — combine tables + menu + orders into main screen
-7. **Payments feature** — simple payment flow
-8. **Kitchen feature** — read-only display for kitchen
-9. **Layout + Routing** — wire everything together
-
----
-
-## 10. Coding Standards
+## 9. Coding Standards
 
 - **NO** `React.FC` — always `function ComponentName()`
 - **NO** default exports — use named exports always
 - All files = kebab-case (e.g., `menu-item-card.tsx`)
 - All functions/components = PascalCase or camelCase
-- Imports: `@/` alias for `src/`, `@features/menu`, `@shared/ui/button`
+- Imports: `@shared/*`, `@features/*`, `@pages/*`, `@layouts/*`, `@stores/*` aliases
 - TanStack Query v5 object syntax (`queryKey`, `queryFn`)
+- Query keys co-located with hooks (no shared query key file)
 - Zustand v5 `create()` + `devtools` middleware
 - RHF v7 + `@hookform/resolvers/zod`
 - Tailwind v4 classes (no `@apply`, no style objects)
 - `cn()` utility from `@shared/utils/cn` for class merging
 - sonner `toast.success()` / `toast.error()` for user notifications
 - lucide-react icons only — no emojis
+- All API calls through `client` from `@shared/api/client` — no direct `fetch` or raw axios
 
 ---
 

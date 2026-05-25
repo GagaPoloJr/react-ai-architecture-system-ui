@@ -81,6 +81,23 @@ const isProd = import.meta.env.PROD  // true for `vite build`
 const mode = import.meta.env.MODE    // 'development' | 'production' | 'test'
 ```
 
+## Node.js & npm
+
+Required versions are pinned in `.nvmrc` at the project root:
+
+```
+20
+```
+
+Switch to the correct Node version:
+
+```bash
+nvm use       # if using nvm
+fnm use       # if using fnm
+```
+
+The project uses npm as the package manager — avoid yarn or pnpm. If peer dependency conflicts arise (e.g. a package pins React 18 but the project uses React 19), fix the root cause by upgrading or removing the offending package rather than using `--legacy-peer-deps`:
+
 ## Feature Flags
 
 ```ts

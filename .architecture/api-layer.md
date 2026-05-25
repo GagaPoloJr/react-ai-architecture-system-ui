@@ -11,59 +11,47 @@
 ```
 shared/api/
 ├── client.ts           # Axios v1 instance, base URL, interceptors
-├── query.ts            # Query key factory, TanStack Query v5 helpers
-├── error.ts            # Error normalization, typed error classes
+├── error.ts            # Error normalization (AppError class, parseAxiosError)
 └── index.ts
 
 features/{feature}/api/
-├── {entity}-api.ts     # Service functions (typed axios calls)
-├── use-{entity}-query.ts     # useQuery wrapper
-├── use-{entity}-mutation.ts  # useMutation wrapper
+├── {name}-api.ts       # Service functions (typed axios calls)
+├── {name}.query.ts     # Query key factory + useQuery hooks
+├── {name}.mutation.ts  # useMutation hooks
 └── index.ts
 ```
 
 ## Axios Client (`shared/api/client.ts`)
 
-Single axios v1 instance:
+Single axios v1 instance — must include mock interceptor in dev and error normalization:
 
 ```ts
 import axios from 'axios'
-import { env } from '@shared/config/env'
+import { setupMockInterceptor } from '@/mocks/interceptor'
+import { parseAxiosError } from './error'
 
 export const client = axios.create({
-  baseURL: env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api',
   timeout: 15_000,
   headers: { 'Content-Type': 'application/json' },
 })
+
+if (import.meta.env.DEV) setupMockInterceptor(client)
+
+client.interceptors.response.use(
+  (response) => response,
+  (error) => { return Promise.reject(parseAxiosError(error)) },
+)
 ```
 
 ### Interceptors
 
-- **Request**: Attach auth token from js-cookie v3 (`Cookies.get('access_token')`)
-- **Response**: Unwrap data, parse with zod schema on boundary
-- **Error**: Normalize to `AppError` shape, handle 401 (clear token + redirect to login)
-
-## Query Key Factory (`shared/api/query.ts`)
-
-Centralized, typed query key generation for TanStack Query v5:
-
-```ts
-export const queryKeys = {
-  users: {
-    all:    ['users'] as const,
-    list:   (params: UserListParams) => ['users', 'list', params] as const,
-    detail: (id: string) => ['users', 'detail', id] as const,
-  },
-  reports: {
-    all:    ['reports'] as const,
-    summary: (period: string) => ['reports', 'summary', period] as const,
-  },
-}
-```
+- **Request (dev)**: `setupMockInterceptor` intercepts all requests and returns mock data — no backend needed
+- **Error**: Normalize to `AppError` shape via `parseAxiosError`, handle 401 (clear token + redirect)
 
 ## Service Functions
 
-Feature service files export pure data-fetching functions returning axios promises:
+Feature service files export pure data-fetching functions using the shared client:
 
 ```ts
 // features/users/api/user-api.ts
@@ -71,47 +59,59 @@ import { client } from '@shared/api/client'
 import type { User, CreateUserDto, UpdateUserDto } from '../types/user'
 
 export const userApi = {
-  list:   (params: UserListParams) => client.get<User[]>('/users', { params }),
-  detail: (id: string) => client.get<User>(`/users/${id}`),
-  create: (data: CreateUserDto) => client.post<User>('/users', data),
-  update: (id: string, data: UpdateUserDto) => client.put<User>(`/users/${id}`, data),
+  list:   (params: UserListParams) => client.get<User[]>('/users', { params }).then(r => r.data),
+  detail: (id: string) => client.get<User>(`/users/${id}`).then(r => r.data),
+  create: (data: CreateUserDto) => client.post<User>('/users', data).then(r => r.data),
+  update: (id: string, data: UpdateUserDto) => client.patch<User>(`/users/${id}`, data).then(r => r.data),
   delete: (id: string) => client.delete(`/users/${id}`),
 }
 ```
 
 ## TanStack Query v5 Hooks
 
-Query hooks use the object-syntax `useQuery`:
+Query hooks must co-locate query keys with the hook that defines them (no shared query key file). Query keys use a factory function pattern:
 
 ```ts
-// features/users/api/use-users-query.ts
+// features/users/api/users.query.ts
 import { useQuery } from '@tanstack/react-query'
-import { queryKeys } from '@shared/api/query'
 import { userApi } from './user-api'
 import type { UserListParams } from '../types/user'
 
+export const queryKeys = {
+  all:    ['users'] as const,
+  lists:  () => [...queryKeys.all, 'list'] as const,
+  list:   (params?: UserListParams) => [...queryKeys.lists(), params] as const,
+  details: () => [...queryKeys.all, 'detail'] as const,
+  detail: (id: string) => [...queryKeys.details(), id] as const,
+}
+
 export function useUsers(params: UserListParams) {
   return useQuery({
-    queryKey: queryKeys.users.list(params),
+    queryKey: queryKeys.list(params),
     queryFn: () => userApi.list(params),
   })
 }
 ```
 
-Mutation hooks handle cache invalidation:
+Mutation hooks handle cache invalidation and user-facing toast notifications via sonner:
 
 ```ts
-// features/users/api/use-create-user-mutation.ts
+// features/users/api/users.mutation.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { queryKeys } from '@shared/api/query'
+import { toast } from 'sonner'
 import { userApi } from './user-api'
+import { queryKeys } from './users.query'
 import type { CreateUserDto } from '../types/user'
 
 export function useCreateUser() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateUserDto) => userApi.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.users.all }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.all })
+      toast.success('User created')
+    },
+    onError: (error) => toast.error(error.message || 'Failed to create user'),
   })
 }
 ```
@@ -126,7 +126,7 @@ export class AppError extends Error {
     message: string,
     public status: number,
     public details?: Record<string, string[]>,
-  ) { super(message) }
+  ) { super(message); this.name = 'AppError' }
 }
 
 export function parseAxiosError(error: unknown): AppError {
@@ -139,13 +139,14 @@ export function parseAxiosError(error: unknown): AppError {
       data?.details,
     )
   }
+  if (error instanceof AppError) return error
   return new AppError('UNKNOWN_ERROR', 'An unexpected error occurred', 500)
 }
 ```
 
 ## TanStack Query Devtools
 
-Enabled only in development via `import.meta.env.DEV`:
+Enabled only in development:
 
 ```tsx
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
