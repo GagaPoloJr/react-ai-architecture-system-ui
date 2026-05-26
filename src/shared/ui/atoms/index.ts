@@ -1,8 +1,0 @@
-export { Button, buttonVariants } from './button'
-export type { ButtonProps } from './button'
-export { Input } from './input'
-export type { InputProps } from './input'
-export { Card } from './card'
-export type { CardProps } from './card'
-export { Skeleton } from './skeleton'
-export type { SkeletonProps } from './skeleton'
