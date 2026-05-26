@@ -130,7 +130,8 @@ Root files:
 
 | What you need                   | Go to                                                    |
 | ------------------------------- | -------------------------------------------------------- |
-| Understanding the folder layout | `.architecture/folder-structure.md`                      |
+| Understanding the folder layout | `.architecture/folder-structure.md` |
+| Node version check (3-layer)    | `.docs/getting-started.md` (Prerequisites section) |
 | Creating a new feature          | `.workflows/feature-planning.md` + `feature-scaffold.sh` |
 | Adding API integration          | `.workflows/api-integration.md`                          |
 | Deciding where state goes       | `.architecture/state-management.md`                      |

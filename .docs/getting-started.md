@@ -5,14 +5,40 @@ This guide gets you from zero to running a new feature in **5 minutes**. You'll 
 ## Prerequisites
 
 - Node.js 20+
-- npm or yarn
+- npm or yarn (npm 10+ recommended)
 - Familiarity with React 19, TypeScript, Tailwind CSS v4, and TanStack Query v5
+
+### ⚠️ Node Version Machine (3-Layer Protection)
+
+Project ini require Node.js 20+. Biar ga waste resource kalau Node version salah, ada 3 lapis pengaman dari luar ke dalam:
+
+| Lapis | Letak | Kapan Jalan | Cara Kerja |
+|-------|-------|-------------|------------|
+| **1** | `examples/check-node.js` | Sebelum apa pun — jalanin manual | Zero dependencies, pure Node.js, langsung exit kalau < 20 |
+| **2** | `examples/*/ .npmrc` (`engine-strict=true`) | Pas `npm install` | Npm sendiri gagal kalau engines.node ga match |
+| **3** | `examples/*/ scripts/check-version.js` | Pas `npm run dev` / `npm run build` | Predev/prebuild hook, safety net terakhir |
+
+**Flow yang bener:**
+
+```bash
+# 1. Cek dulu — milidetik, zero deps
+node examples/check-node.js
+
+# 2. Kalau lolos, baru masuk project & jalanin
+cd examples/wedding-org-marketing
+npm run dev
+```
+
+Kalau jalanin `npm run dev` langsung tanpa cek duluan, lapis 3 tetap bakal nangkep. Tapi lebih hemat waktu kalau cek duluan pake lapis 1.
 
 ## Quick Start (Greenfield Project)
 
 If you're starting a **brand new project**, the fastest path is the bootstrap script:
 
 ```bash
+# 0. Cek Node version dulu!
+node examples/check-node.js
+
 # Clone this architecture repo
 git clone <this-repo-url> my-project-arch
 cd my-project-arch

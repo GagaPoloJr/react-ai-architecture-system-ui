@@ -10,7 +10,7 @@
 
 ## Hard Constraints (MUST follow for every project)
 
-1. **Node version**: Always run `nvm use 20` before any npm command. Verify with `node --version`.
+1. **Node version**: Must with Node 20+.if there is no node, install: `nvm install 20`, `fnm install 20`, `volta install node@20`, or download manual in [nodejs.org](https://nodejs.org/). Skip automatically via `npm run dev` (there is a predev for checking the scripts).
 2. **Examples folder**: `examples/` is a collection of project folders. Each project gets its own subfolder (e.g. `examples/wedding-org-marketing/`, `examples/pos-app-restaurant/`). The prompt `.md` file stays at `examples/` level.
 3. **Scaffold first**: Always scaffold via Vite CLI (`npm create vite`) — never create files manually before Vite succeeds.
 4. **Architecture files**: Never remove `.agent/`, `.architecture/`, `.design/`, `.rules/`, `.scaffolds/`, `.templates/`, `.workflows/` — these are the operating system.
@@ -81,13 +81,21 @@ Read `core.md`. Then load all these files for context:
 
 Each project gets its own subfolder inside `examples/` — this keeps the root clean for architecture files only.
 
-Before scaffolding features, ensure the project environment is ready:
+**⚠️ LANGKAH 0: Check Node version dulu (sebelum apa-apa!)**
+
+Jalanin ini PERTAMA KALI di root project. Cuma butuh milidetik, zero dependencies:
 
 ```bash
-# MUST: use correct Node version first
-nvm use 20
-node --version        # should match .nvmrc (20)
+node examples/check-node.js
+```
 
+Kalau output `✓ Node.js v20 — OK, lanjut!`, lanjut. Kalau error, ikutin petunjuk installnya.
+
+---
+
+**⚠️ LANGKAH 1: Scaffold project**
+
+```bash
 # Create project subfolder inside examples/
 mkdir -p examples/{{project-name}}
 cd examples/{{project-name}}
@@ -95,7 +103,7 @@ cd examples/{{project-name}}
 # MUST: always scaffold via Vite — never create files manually
 npm create vite@5 . -- --template react-ts
 
-# Install dependencies (no --legacy-peer-deps needed)
+# Install dependencies (auto gagal kalau Node < 20 karena engine-strict)
 npm install
 
 # Copy environment template
@@ -105,12 +113,23 @@ cp ../.env.example .env.local 2>/dev/null || echo "No .env.example at examples/ 
 cd ../..
 ```
 
+**⚠️ LANGKAH 2: Mulai develop**
+
+```bash
+cd examples/{{project-name}}
+npm run dev     # predev otomatis ngecek Node version lagi sebelum vite jalan
+```
+
+---
+
 Verify:
 
-- `.nvmrc` exists with Node version (e.g. `20`)
+- `examples/check-node.js` exists — jalanin dulu sebelum apa pun
+- `.npmrc` di project subfolder punya `engine-strict=true`
+- `scripts/check-version.js` di project subfolder — predev/prebuild hook otomatis
 - `examples/` folder exists at root
 - Project lives in its own subfolder: `examples/{{project-name}}/`
-- Root stays clean — only `.agent/`, `.architecture/`, `.design/`, etc.
+- Root stays clean — hanya `.agent/`, `.architecture/`, `.design/`, etc.
 - `.env.local` is set inside the project subfolder
 - `npm run dev` starts without errors (run from the project subfolder)
 
