@@ -4,7 +4,10 @@
 
 ```
 shared/
-├── ui/              # Radix primitives + CVA variants + cn()
+├── ui/
+│   ├── atoms/         # Radix primitives + CVA variants + cn()
+│   ├── molecules/     # FormField, Card, DataTable
+│   └── sections/      # Section components used across 2+ pages
 ├── lib/             # Pure functions (date-fns v4 wrappers, formatters)
 ├── api/             # Axios v1 client, interceptors, TanStack Query v5 base
 ├── hooks/           # Generic React hooks (use-debounce, use-media-query)
@@ -19,6 +22,7 @@ shared/
 |------|----------|
 | `@radix-ui/*` wrappers (Button, Dialog, Select) | `shared/ui/atoms/` |
 | CVA variants for Radix components | `shared/ui/atoms/` |
+| Cross-page section components (team-grid, stats-bar, about-section) | `shared/ui/sections/` |
 | `cn()` utility (tailwind-merge + clsx v2) | `shared/utils/cn.ts` |
 | Axios v1 instance with interceptors | `shared/api/client.ts` |
 | TanStack Query v5 query key factory | `shared/api/query.ts` |

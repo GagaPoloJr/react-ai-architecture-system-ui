@@ -6,6 +6,7 @@
 Layer 6: Features         ─── Feature-specific compositions
 Layer 5: Pages            ─── Route-level components (thin)
 Layer 4: Layouts          ─── AppLayout, AuthLayout (Outlet pattern)
+Layer 3.5: Sections       ─── Cross-page section components (shared/ui/sections/)
 Layer 3: Organisms        ─── DataList, ConfirmDialog, EmptyState
 Layer 2: Molecules        ─── FormField, Card, DataTable
 Layer 1: Primitives       ─── Radix wrappers, CVA variants, cn()
@@ -122,6 +123,21 @@ shared/ui/organisms/
 └── index.ts
 ```
 
+## Layer 3.5 — Sections (Cross-page)
+
+Section components that appear on 2+ pages. They compose organisms, molecules, and atoms into full section blocks.
+
+```
+shared/ui/sections/
+├── team-grid.tsx       # Used on home + about pages
+├── stats-bar.tsx       # Used on home + about pages
+├── about-section.tsx   # Used on home + about pages
+├── contact-form.tsx    # Used on home + contact pages
+└── index.ts
+```
+
+**Rule**: If a section component is imported by 2+ page files, it belongs here. Single-page sections stay in `features/<name>/components/`.
+
 ## Layer 4 — Layouts
 
 Page-level structure using `<Outlet />` from react-router-dom v7:
@@ -171,4 +187,4 @@ Load the skill when generating UI at any layer.
 
 - ESLint rules restrict imports to forbid downward layer violations.
 - Barrel files at each layer control the public API surface.
-- Layer 0–4 live in `shared/ui/`. Layer 5 lives in `pages/`. Layer 6 lives in `features/`.
+- Layer 0–3.5 live in `shared/ui/`. Layer 4 lives in `layouts/`. Layer 5 lives in `pages/`. Layer 6 lives in `features/`.

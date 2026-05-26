@@ -1,9 +1,11 @@
 # Reusability Rules
 
 ## 1. Extraction Thresholds
-- **3+ uses**: Extract to `@/shared/ui/` for components, `@/shared/lib/` for utilities.
+- **2+ pages**: Extract section components to `shared/ui/sections/` (team-grid, stats-bar, about-section).
+- **3+ uses within a single feature**: Extract to that feature's `components/` subfolder.
 - **2 uses, architecturally significant**: Extraction allowed without waiting for a third occurrence. "Architecturally significant" means the abstraction is required by system constraints (auth boundary, data layer contract).
 - **1 use**: Keep local until another consumer emerges. Resist the urge to over-abstract.
+- **Anti-pattern**: Creating a new feature directory (`features/hero/`, `features/stats/`) for a single section component used in one page. Instead, group by page: `features/home/components/{hero,stats,...}-section.tsx`.
 
 ## 2. Shared Component API Design
 - All shared components MUST be **controlled** by default. Accept `value` + `onChange` props.
