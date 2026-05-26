@@ -163,6 +163,8 @@ These are fully generated projects inside `examples/`. Run them locally:
 cd examples/company-profile && npm run dev
 # or
 cd examples/wedding-org-marketing && npm run dev
+# or
+cd examples/axiom && npm run dev
 ```
 
 ### 1. Postlight — SaaS Company Profile
@@ -204,6 +206,26 @@ A luxury wedding planning marketing site with warm editorial aesthetic.
 | **Key pattern**  | Double-bezel cards, horizontal snap-scroll on mobile, staggered scroll reveals, button-in-Button pattern |
 
 ![Serenity Weddings hero section](.docs/screenshots/wedding-hero.png)
+
+### 3. Axiom — Strategy, Design, Engineering
+
+A dark editorial agency landing page with GSAP-powered scroll animations and a refined serif aesthetic.
+
+| Aspect           | Detail                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| **Company**      | Axiom — Strategy, Design, Engineering                                                         |
+| **Design**       | High-End Visual Design — Editorial Dark                                                       |
+| **Colors**       | Canvas `#FAFAF8`, Text `#1C1917`, Accent `#57534E`, Surface `#F3F0EB`                         |
+| **Font**         | Playfair Display + Plus Jakarta Sans                                                           |
+| **Style**        | GSAP scroll-triggered reveals, grain texture overlay, count-up metrics, magnetic links        |
+| **Pages**        | Home, About, Portfolio, Contact                                                               |
+| **Features**     | 8 (hero, philosophy, portfolio, impact, team, perspectives, contact, count-up)                |
+| **Source files** | 30 files, ~1,400 lines                                                                        |
+| **Images**       | 9 local images (hero background, portfolio shots, team avatars)                               |
+| **Prompt**       | `.prompts/marketing-site-axiom.md` (~3.8K tokens)                                             |
+| **Key pattern**  | `useGSAP` + ScrollTrigger for all scroll animations, `MagneticLink` cursor effect             |
+
+![Axiom demo scroll](.docs/screenshots/axiom-demo.gif)
 
 ---
 
