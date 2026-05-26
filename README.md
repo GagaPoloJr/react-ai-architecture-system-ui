@@ -149,23 +149,78 @@ Each agent file is a complete prompt — the AI knows your stack, rules, and pat
 
 ---
 
-## Quick Navigation
+## What You Can Build
 
-| Need                  | Open                                                           |
-| --------------------- | -------------------------------------------------------------- |
-| Start here            | `core.md`                                                      |
-| AI prompts            | `ai-collaboration.md`                                          |
-| Step-by-step init     | `.workflows/init.md`                                           |
-| Create a feature      | `.workflows/feature-planning.md`                               |
-| Add API integration   | `.workflows/api-integration.md`                                |
-| State decision tree   | `.architecture/state-management.md`                            |
-| Build a form          | `.templates/form/form-template.md`                             |
-| Design the UI         | `.design/README.md` + `.design/design-taste-frontend/SKILL.md` |
-| Full app example      | `.prompts/pos-app-restaurant.md`                               |
-| Code review checklist | `.workflows/code-review.md`                                    |
-| Performance rules     | `.rules/performance.md`                                        |
-| Accessibility rules   | `.agent/accessibility-reviewer.md`                             |
-| Scaling guide         | `.docs/scaling-guide.md`                                       |
+The system generates full-stack React SPAs with 5-10 features, 6+ pages, custom design systems, and production-ready code. Two examples below.
+
+---
+
+## Examples
+
+These are fully generated projects inside `examples/`. Run them locally:
+
+```bash
+cd examples/company-profile && npm run dev
+# or
+cd examples/wedding-org-marketing && npm run dev
+```
+
+### 1. Postlight — SaaS Company Profile
+
+A modern engineering tools SaaS landing page with light indigo glassmorphism design.
+
+| Aspect           | Detail                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------- |
+| **Company**      | Postlight — Modern engineering for modern teams                                             |
+| **Design**       | High-End Visual Design — Ethereal Glass (Light)                                             |
+| **Colors**       | Canvas `#F5F3FF`, Accent `#6366F1` (Indigo), Text `#1E1B4B`                                 |
+| **Font**         | Plus Jakarta Sans Variable                                                                  |
+| **Style**        | Glassmorphism cards (`bg-white/70 backdrop-blur-xl`), floating glass header, indigo borders |
+| **Pages**        | Home, About, Blog (list + detail), Contact, Privacy                                         |
+| **Features**     | 10 (hero, features, stats, about, team, pricing, testimonials, blog, FAQ, contact)          |
+| **Source files** | 108 files, ~2,400 lines                                                                     |
+| **Images**       | 17 local Pexels images (hero, features, team avatars, blog covers, office)                  |
+| **Prompt**       | `.prompts/company-profile-landing.md` (~4.2K tokens)                                        |
+| **Key pattern**  | `useScrollToTop` hook on route change, floating nav, scroll-reveal animations               |
+
+![Postlight hero section](.docs/screenshots/company-profile-hero.png)
+
+### 2. Serenity Weddings — Premium Wedding Organizer
+
+A luxury wedding planning marketing site with warm editorial aesthetic.
+
+| Aspect           | Detail                                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------- |
+| **Company**      | Serenity Weddings — Timeless Celebrations                                                                |
+| **Design**       | High-End Visual Design — Editorial Luxury                                                                |
+| **Colors**       | Cream `#FDFBF7`, Sage `#9CAF88`, Espresso `#2D1B00`, Gold `#D4AF37`, Dusty Rose `#C9A9A6`                |
+| **Font**         | Inter Variable                                                                                           |
+| **Style**        | Double-bezel card architecture, asymmetric bento grids, fluid glass pill nav, ample whitespace           |
+| **Pages**        | Home, Services, Portfolio, Pricing, Contact, About                                                       |
+| **Features**     | 7 (hero, services, portfolio, testimonials, pricing, contact, about)                                     |
+| **Source files** | 44 files, ~1,550 lines                                                                                   |
+| **Images**       | picsum.photos placeholders (hero, portfolio, team)                                                       |
+| **Prompt**       | `.prompts/marketing-site-wedding-orginizer.md` (~4.6K tokens)                                            |
+| **Key pattern**  | Double-bezel cards, horizontal snap-scroll on mobile, staggered scroll reveals, button-in-Button pattern |
+
+![Serenity Weddings hero section](.docs/screenshots/wedding-hero.png)
+
+---
+
+## Token Budget
+
+Estimated tokens consumed per AI generation session (based on prompt + context docs):
+
+| Scenario | Docs Loaded | Est. Tokens |
+|---|---|---|
+| Single feature scaffold | `core.md` + `feature-generator.md` + 1 arch doc | ~7K |
+| Full page generation | prompt template + `core.md` + `frontend-architect` + 3-4 arch docs | ~15K |
+| Full project generation | prompt template + `core.md` + all agents + 15 arch docs + design SKILL | ~30K |
+| Maximum (all context) | prompt + agents + architecture + rules + templates + design | ~45K |
+
+These are one-time reads — the AI caches context across messages within a session. A full project (like company-profile) typically costs 3-5 generation rounds at ~30K tokens each.
+
+> **OpenCode + big-pickle note**: This system was built and tested on OpenCode with `big-pickle` (large context model). The 30-45K token budget for full project generation fits comfortably within a 128K+ context window, leaving ~80K tokens for conversation history, iterative refinement, and code output.
 
 ---
 
@@ -176,6 +231,16 @@ Active, evolving. Built on React 19 + Vite 7 + Tailwind CSS v4.
 ### Design System
 
 This project uses [Taste Skill](https://www.tasteskill.dev) — The Anti-Slop Frontend Framework for AI Agents by [Leon Lin](https://github.com/Leonxlnx) and [blueemi](https://github.com/blueemi99). 12 design skills are installed in `.design/` and loaded automatically by OpenCode.
+
+Optionally install [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (83K stars) for 67 UI styles, 161 color palettes, 57 font pairings, and industry-specific reasoning rules:
+
+```bash
+npm install -g uipro-cli
+cd your-project
+uipro init --ai opencode   # or: claude, cursor, windsurf, gemini, etc.
+```
+
+See `.workflows/init.md` Step 0 for the design selection workflow.
 
 ### Roadmap
 

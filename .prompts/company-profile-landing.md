@@ -16,24 +16,17 @@
 
 ## About This Project
 
-This is **Postlight** — a SaaS company profile landing page for a modern engineering tools company. It's a single-page marketing site with stacked sections: hero, stats bar, features grid, about, team, pricing, testimonials, blog, FAQ, and a contact form. Built with React 18, TypeScript, Tailwind v4, react-router-dom v7, and TanStack Query v5.
+**Postlight** — a SaaS company profile landing page for a modern engineering tools company. Single-page marketing site with stacked sections: hero, stats bar, features grid, about, team, pricing, testimonials, blog, FAQ, and a contact form. Built with React 18, TypeScript, Tailwind v4, react-router-dom v7, TanStack Query v5.
 
 ---
 
-## How to Use This Template
+## Load Context Files
 
-1. Replace the **Project** section with your startup's name, tagline, and product description
-2. Adjust the **Feature Definitions** to match your product offerings
-3. Switch Pexels image IDs in section 5 to match your brand imagery
-4. Keep everything else — it references the architecture docs that ship with this project
+### Design Skills
 
----
-
-Load all these files for context:
-
-### Design
-
-- `.design/high-end-visual-design/SKILL.md` — Reference, but override with Light Indigo Glassmorphism (section 1 below)
+- `.design/high-end-visual-design/SKILL.md`
+- `.design/minimalist-ui/SKILL.md`
+- `.design/industrial-brutalist-ui/SKILL.md`
 
 ### Agents
 
@@ -63,7 +56,20 @@ Load all these files for context:
 
 ---
 
-## 0. Project Setup
+## Step 0: Design Selection
+
+Follow `.workflows/init.md` Step 0 — handles both UI/UX Pro Max installed (scenario A) and not installed (scenario B). Recommend, present options, wait for user choice.
+
+This project type is **SaaS company profile landing page**. AI recommendation example:
+
+> **Recommended**: High-End Visual Design — Ethereal Glass (light variant)
+> *Rationale: Postlight is a modern engineering tools brand that needs to feel premium and technically sophisticated. The Ethereal Glass archetype with light background provides the right balance of technical polish and approachability.*
+
+Once chosen, plug the design's concrete values into all sections below. The rest of this template uses **Light Indigo Glassmorphism** (High-End Visual Design — Ethereal Glass light variant) as the default.
+
+---
+
+## Step 1: Project Setup
 
 Each project gets its own subfolder inside `examples/`.
 
@@ -73,6 +79,7 @@ cd examples/{{project-name}}
 
 npm create vite@5 . -- --template react-ts
 npm install
+
 npm install react-router-dom @tanstack/react-query react-hook-form @hookform/resolvers zod sonner react-helmet-async clsx tailwind-merge class-variance-authority @radix-ui/react-slot @radix-ui/react-accordion @radix-ui/react-dialog lucide-react date-fns zustand i18next react-i18next js-cookie axios @fontsource-variable/plus-jakarta-sans
 
 cd ../..
@@ -80,62 +87,7 @@ cd ../..
 
 ---
 
-## 1. Design Configuration — Light Indigo Glassmorphism
-
-### Design Vibe
-
-Light indigo glassmorphism — airy, premium, approachable. Not dark. Not heavy.
-
-### Font
-
-- **Headings + Body**: `Plus Jakarta Sans Variable` (single font family throughout)
-- **BANNED**: Inter, Roboto, Arial, Outfit, Manrope, Open Sans, Helvetica
-
-### Color Palette
-
-```css
---color-canvas:       #F5F3FF;   /* lavender-50 — light indigo wash */
---color-surface:      #FFFFFF;   /* pure white cards */
---color-surface-hover:#EEF2FF;   /* indigo-50 hover state */
---color-text-primary: #1E1B4B;   /* indigo-950 — near-black indigo */
---color-text-secondary:#6B6B9E;  /* indigo-400 — muted */
---color-border:       rgba(99, 102, 241, 0.12);
---color-accent:       #6366F1;   /* indigo-500 — primary accent */
---color-accent-subtle:rgba(99, 102, 241, 0.08);
-```
-
-- Accent: Indigo `#6366F1` — single primary accent
-- CTA buttons: Indigo `#6366F1` (not emerald — that was a prior iteration)
-- **BANNED**: Dark backgrounds, OLED black, pure `#000000`, purple gradients, neon glows
-
-### Layout Principles
-
-- **Floating glass header**: `fixed top-4 left-4 right-4 mx-auto rounded-2xl bg-white/70 backdrop-blur-xl border border-[rgba(99,102,241,0.1)]` — pill-like, detached from top edge
-- **Section padding**: `py-24 lg:py-32` — generous whitespace
-- **Cards**: White/80 `backdrop-blur-xl` with indigo borders (`border-[rgba(99,102,241,0.08)]`) and subtle glass shadow (`shadow-[0_0_0_1px_rgba(99,102,241,0.04),_0_4px_24px_rgba(99,102,241,0.06)]`)
-- **Hero**: Split-screen (text left, product mockup right), ambient gradient orbs as background decoration
-- **Stats**: Centered row, large values with indigo accent
-- **Features**: 3-column bento-style grid (not zig-zag, not 3-column equal)
-- **Team**: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
-- **Pricing**: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` with popular card scaled up
-- **CTA buttons**: Always use trailing ArrowIcon pattern — `Button variant="primary"` with `<ArrowIcon />` child
-
-### Animations
-
-- Entry animations: fade-in-up with `opacity-0 translate-y-8` → `opacity-100 translate-y-0`
-- All transitions: `duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]` — no linear or ease-in-out
-- Stagger children with `style={{ animationDelay: `${i * 0.1}s` }}`
-- Reduced motion: `@media (prefers-reduced-motion: reduce)` zeroes out durations
-
-### Tailwind v4 Notes
-
-- Use Tailwind v4 class syntax (no `@apply`, no style objects)
-- `@theme` block defines custom tokens in `index.css`
-- `cn()` utility from `@shared/utils/cn` for class merging (uses `clsx` + `tailwind-merge`)
-
----
-
-## 2. Feature Scaffolding
+## Step 2: Feature Scaffolding
 
 ```bash
 cd examples/{{project-name}}
@@ -154,20 +106,9 @@ bash ../../.scaffolds/feature-scaffold.sh faq
 cd ../../
 ```
 
-Each command creates:
-
-```
-src/features/{{featureName}}/
-├── api/
-├── components/
-├── schemas/
-├── types/
-└── index.ts
-```
-
 ---
 
-## 3. Pages & Routes
+## Step 3: Pages & Routes
 
 ```
 src/pages/
@@ -224,7 +165,7 @@ export function useScrollToTop() {
 
 ---
 
-## 4. Feature Definitions
+## Step 4: Feature Definitions
 
 ### Hero (`features/hero/`)
 
@@ -271,12 +212,6 @@ export interface StatItem {
   label: string;
   description?: string;
 }
-```
-
-### About (`features/about/`)
-
-```typescript
-// Check actual types — features/about/types/index.ts
 ```
 
 ### Team Grid (`features/team/`)
@@ -380,9 +315,9 @@ export type ContactFormData = z.infer<typeof contactFormSchema>
 
 ---
 
-## 5. Images — Local Pexels Downloads
+## Step 5: Images — Local Pexels Downloads
 
-**Do NOT hotlink Pexels CDN URLs.** Download images to `public/images/` with descriptive names:
+**Do NOT hotlink Pexels CDN URLs.** Download to `public/images/`:
 
 ```bash
 mkdir -p public/images
@@ -391,14 +326,12 @@ curl -sL -A "Mozilla/5.0" -o public/images/feature-collab.jpg   "https://images.
 curl -sL -A "Mozilla/5.0" -o public/images/feature-analytics.jpg "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/feature-coding.jpg   "https://images.pexels.com/photos/1181672/pexels-photo-1181672.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/office.jpg           "https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=2"
-# Team avatars
 curl -sL -A "Mozilla/5.0" -o public/images/avatar-riley.jpg     "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/avatar-morgan.jpg    "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/avatar-priya.jpg     "https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/avatar-jordan.jpg    "https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/avatar-samira.jpg    "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/avatar-tyler.jpg     "https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=400&dpr=2"
-# Blog covers
 curl -sL -A "Mozilla/5.0" -o public/images/blog-team-handshake.jpg "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/blog-collab.jpg      "https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=2"
 curl -sL -A "Mozilla/5.0" -o public/images/blog-analytics.jpg   "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=800&dpr=2"
@@ -411,51 +344,49 @@ Reference locally: `/images/hero-workspace.jpg` (not the CDN URL).
 
 ---
 
-## 6. Header — Floating Glass Card
+## Step 6: Layout Components
+
+```
+layouts/
+├── app-layout.tsx           # Nav + main + footer + useScrollToTop
+├── components/
+│   ├── site-header.tsx      # Floating glass card (top-4, rounded-2xl, backdrop-blur-xl)
+│   ├── site-footer.tsx      # CTA section + multi-column footer + bottom bar
+│   └── index.ts
+└── index.ts
+```
+
+### Header Pattern (Light Indigo Glassmorphism)
 
 ```tsx
 <header className="fixed top-4 left-4 right-4 z-50 bg-white/70 backdrop-blur-xl border border-[rgba(99,102,241,0.1)] rounded-2xl shadow-[0_0_0_1px_rgba(99,102,241,0.04),_0_4px_24px_rgba(99,102,241,0.06)] hidden md:block max-w-7xl mx-auto">
-  <div className="flex items-center justify-between px-6 h-14">
-    <Link to="/" className="text-sm font-medium text-text-primary tracking-tight">
-      Postlight<span className="text-accent">.</span>
-    </Link>
-    {/* nav links with active state: text-accent bg-accent/5 */}
-    <Button variant="primary" size="sm" asChild>
-      <Link to="/contact">Get started<ArrowIcon /></Link>
-    </Button>
-  </div>
+  {/* Logo left, nav links center, CTA button right */}
 </header>
 ```
 
-Mobile: inline hamburger within same glass card. Full-screen menu on open (`bg-white/95 backdrop-blur-3xl`).
+Mobile: same glass card with inline hamburger → full-screen overlay (`bg-white/95 backdrop-blur-3xl`).
 
----
-
-## 7. Footer Structure
+### Footer Structure
 
 ```
-Site Footer (bg-canvas):
-├── CTA Section     — "Ready to ship faster?" + primary button, border-b separator
+footer (bg-canvas, border-t border-[rgba(99,102,241,0.08)]):
+├── CTA Section     — large heading + primary button, border-b separator
 ├── Main Footer
-│   ├── Brand column (col-span-2) — Logo + description + social links (X, GitHub, LinkedIn)
+│   ├── Brand column (col-span-2) — Logo + description + social links
 │   ├── Product column
 │   ├── Company column
 │   └── Resources column
 └── Bottom bar     — Copyright + Privacy + Terms
 ```
 
-All borders use `border-[rgba(99,102,241,0.08)]`.
-
 ---
 
-## 8. Buttons (Shared UI)
+## Step 7: Buttons (Shared UI)
 
 ```tsx
-// src/shared/ui/atoms/button.tsx
-// Uses Radix Slot for polymorphic asChild
-// Variants: primary (bg-accent text-white), secondary (border-border), ghost
-// Sizes: sm, md, lg, xl, icon
-// ArrowIcon component: white circular bg on hover with translate animation
+// Button uses Radix Slot for polymorphic asChild
+// Variants: primary (bg-accent text-white rounded-full), secondary (border-border), ghost
+// ArrowIcon: inline circular SVG wrapper that translates on group-hover
 ```
 
 Usage:
@@ -470,7 +401,7 @@ Usage:
 
 ---
 
-## 9. Coding Standards
+## Step 8: Coding Standards
 
 - **NO** `React.FC` — always `function ComponentName()`
 - **NO** default exports — use named exports always
@@ -481,22 +412,22 @@ Usage:
 - Query keys co-located with hooks (no shared query key file)
 - RHF v7 + `@hookform/resolvers/zod` for contact form
 - Tailwind v4 classes (no `@apply`, no style objects)
-- `cn()` utility from `@shared/utils/cn` for class merging
+- `cn()` utility from `@shared/utils/cn` (`clsx` + `tailwind-merge`)
 - sonner `toast.success()` / `toast.error()` for form submissions
 - lucide-react icons — no emojis
-- All API calls through `client` from `@shared/api/client` — no direct `fetch` or raw axios
+- All API calls through `client` from `@shared/api/client`
 - Images always use local `/images/` paths, never external CDN URLs
 - All asymmetric layouts MUST collapse to single-column below `768px`
 
 ---
 
-## 10. Responsive Design
+## Step 9: Responsive Design
 
-- Mobile-first: base styles = mobile, breakpoints (`sm:`, `md:`, `lg:`) = larger screens
-- Hero: stacked on mobile (image below text), split-screen on `lg:`
+- Mobile-first: base = mobile, breakpoints (`sm:`, `md:`, `lg:`) = larger screens
+- Hero: stacked on mobile, split-screen on `lg:`
 - Stats: `grid-cols-2 md:grid-cols-4`
 - Team: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
-- Pricing: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` with popular card scaled
+- Pricing: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
 - Blog list: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
 - Section padding: `py-16 md:py-24 lg:py-32`
 - Images: always `object-cover` with explicit aspect ratios
@@ -505,21 +436,19 @@ Usage:
 
 ---
 
-## 11. Accessibility
+## Step 10: Accessibility
 
 - All images require descriptive `alt` text
 - Navigation must be keyboard-navigable
 - Form inputs require associated labels
 - Color contrast meets WCAG 2.1 AA standards
 - Focus indicators visible on all interactive elements
-- Skip-to-content link as first focusable element
 - Proper heading hierarchy (h1 → h2 → h3, never skip levels)
 - ARIA labels on icon-only buttons and interactive cards
-- Tab order follows visual order
 
 ---
 
-## 12. SEO & Meta
+## Step 11: SEO & Meta
 
 - Every page uses `react-helmet-async` for title and meta tags
 - Open Graph and Twitter Card meta tags for social sharing
@@ -527,7 +456,7 @@ Usage:
 
 ---
 
-## 13. Dependencies
+## Dependencies
 
 ```json
 {

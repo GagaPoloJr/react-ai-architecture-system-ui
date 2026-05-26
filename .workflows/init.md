@@ -1,5 +1,66 @@
 # Project Initialization Workflow
 
+## 0. Design Selection
+
+Before any code, the user must pick a visual direction. The AI handles two scenarios:
+
+### Scenario A: UI/UX Pro Max Is Installed (Recommended)
+
+[UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) is a skill with 67 UI styles, 161 color palettes, 57 font pairings, and 161 industry-specific reasoning rules.
+
+**Install it once** (if not already installed):
+
+```bash
+npm install -g uipro-cli
+cd /path/to/your/project
+uipro init --ai claude      # Claude Code
+uipro init --ai cursor      # Cursor
+uipro init --ai windsurf    # Windsurf
+uipro init --ai opencode    # OpenCode
+uipro init --ai gemini      # Gemini CLI
+# or: uipro init --ai all   # Install for all assistants
+```
+
+**Use it**: Run `skill ui-ux-pro-max` (the skill auto-activates for UI/UX requests). Or run the search script directly:
+
+```bash
+python3 .claude/skills/ui-ux-pro-max/scripts/search.py "SaaS landing page" --design-system -p "ProjectName"
+```
+
+The search engine returns a complete design system: pattern, style, colors, typography, effects, anti-patterns.
+
+### Scenario B: UI/UX Pro Max Not Installed
+
+Fall back to the project's built-in `.design/` skills. Read each `SKILL.md` and present options manually.
+
+### AI Recommendation
+
+Analyze the project (type, audience, brand vibe, technical complexity) and recommend ONE design direction with rationale.
+
+### Options List
+
+Present these options for the user to choose from:
+
+| # | Design Skill | Archetype / Mode | Best For | Key Traits |
+|---|---|---|---|---|
+| 1 | **High-End Visual Design** | Ethereal Glass (Light) | SaaS, Tech, AI | Glassmorphism, floating cards, accent indigo, backdrop-blur, premium polish |
+| 2 | **High-End Visual Design** | Ethereal Glass (Dark) | SaaS, AI, Developer tools | OLED black, radial mesh gradients, double-bezel cards, dark-and-rich |
+| 3 | **High-End Visual Design** | Editorial Luxury | Lifestyle, Agency, Real Estate | Warm creams, serif fonts, noise overlay, physical/paper feel |
+| 4 | **High-End Visual Design** | Soft Structuralism | Consumer, Health, Portfolio | Silver-grey, massive bold type, airy components, soft shadows |
+| 5 | **Minimalist UI** | Premium Utilitarian | Editorial, Documentation, Workspace | Monochrome, bento grids, typographic contrast, no gradients |
+| 6 | **Industrial Brutalist UI** | Swiss Industrial Print (Light) | Data dashboards, Portfolios | Rigid grids, extreme type scale, primary red accent |
+| 7 | **Industrial Brutalist UI** | Tactical Telemetry (Dark) | Developer tools, Aerospace | Monospace, CRT scanlines, high data density |
+
+If UI/UX Pro Max is installed, the search engine may suggest additional styles beyond this list. The AI must include those in the options.
+
+The AI must wait for the user's choice before proceeding to Step 1.
+
+### Design Reference
+
+If UI/UX Pro Max was used, its output defines the full design system. Otherwise, read the chosen `.design/*/SKILL.md` for fonts, colors, spacing, card patterns, and animations. Apply the chosen design's values throughout the rest of this workflow.
+
+---
+
 ## 1. Create Vite + React + TypeScript Project
 ```bash
 npm create vite@latest . -- --template react-ts
