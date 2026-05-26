@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/plus-jakarta-sans";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: #F5F3FF;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #EEF2FF;
+  --color-text-primary: #1E1B4B;
+  --color-text-secondary: #6B6B9E;
+  --color-border: rgba(99, 102, 241, 0.12);
+  --color-accent: #6366F1;
+  --color-accent-subtle: rgba(99, 102, 241, 0.08);
+}
+
+html {
+  background-color: #F5F3FF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
